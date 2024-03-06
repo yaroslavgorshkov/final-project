@@ -1,0 +1,16 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: 20052005
+
+  jpa:
+    show-sql: true
+
+  liquibase:
+    change-log: "classpath:db/changelog/db.changelog-master.xml"
+    drop-first: true
+
+jwt:
+  secret: wdwdwd
+  lifetime: 1D

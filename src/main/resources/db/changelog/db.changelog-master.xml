@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+
+    <changeSet id="create-table-users" author="you">
+        <createTable tableName="users">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="username" type="varchar(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="password" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_role" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create-table-user-tasks" author="you">
+        <createTable tableName="user_tasks">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="description" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="task_status" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create-table-pro-tasks" author="you">
+        <createTable tableName="pro_tasks">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="creation_time" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="deadline" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="task_status" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="insert-users-data" author="you">
+        <sql>INSERT INTO users (username, password, user_role) VALUES
+                                                                   ('user1', '$2a$10$aVljD5fETQVRIvJ8M8LQguuutKJ/69zjYp.6sShLwazNqHGqydOw6', 'USER'),
+                                                                   ('user2', '$2a$10$aVljD5fETQVRIvJ8M8LQguuutKJ/69zjYp.6sShLwazNqHGqydOw6', 'USER'),
+                                                                   ('user3', '$2a$10$aVljD5fETQVRIvJ8M8LQguuutKJ/69zjYp.6sShLwazNqHGqydOw6', 'PRO'),
+                                                                   ('user4', '$2a$10$aVljD5fETQVRIvJ8M8LQguuutKJ/69zjYp.6sShLwazNqHGqydOw6', 'PRO'),
+                                                                   ('user5', '$2a$10$aVljD5fETQVRIvJ8M8LQguuutKJ/69zjYp.6sShLwazNqHGqydOw6', 'ADMIN')
+                                                                   ;</sql>
+    </changeSet>
+
+    <changeSet id="insert-user-tasks-data" author="you">
+        <sql>INSERT INTO user_tasks (description, task_status, user_id) VALUES
+                                                                            ('Complete homework', 'IN_PROGRESS', 1),
+                                                                            ('Clean the room', 'COMPLETED', 1),
+                                                                            ('Help mother', 'EXPIRED', 1),
+                                                                            ('Go for a walk', 'IN_PROGRESS', 2),
+                                                                            ('Play computer games', 'COMPLETED', 2),
+                                                                            ('Make smth', 'EXPIRED', 2)
+                                                                            ;</sql>
+    </changeSet>
+
+    <changeSet id="insert-pro-tasks-data" author="you">
+        <sql>INSERT INTO pro_tasks (creation_time, deadline, description, task_status, user_id)
+             VALUES (NOW(), NOW() + INTERVAL '1 HOUR', 'Call to Team Lead', 'IN_PROGRESS', 3),
+                    (NOW(), NOW() + INTERVAL '2 HOURS', 'Debug the project', 'COMPLETED', 3),
+                    (NOW(), NOW() + INTERVAL '3 HOURS', 'Buy 1 bitcoin', 'EXPIRED', 3),
+                    (NOW(), NOW() + INTERVAL '4 HOURS', 'Meeting with president', 'IN_PROGRESS', 4),
+                    (NOW(), NOW() + INTERVAL '5 HOURS', 'Watch the cartoons', 'COMPLETED', 4),
+                    (NOW(), NOW() + INTERVAL '6 HOURS', 'Do smth', 'EXPIRED', 4)
+        ;</sql>
+    </changeSet>
+
+</databaseChangeLog>
