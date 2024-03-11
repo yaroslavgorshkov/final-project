@@ -1,6 +1,7 @@
 package com.example.finalproject.entity;
 
 import com.example.finalproject.util.TaskStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,5 +22,6 @@ public class Task {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @JsonIgnore //??
     private User user;
 }

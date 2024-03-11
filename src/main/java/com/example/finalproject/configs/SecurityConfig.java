@@ -37,10 +37,9 @@ public class SecurityConfig {
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(registry -> registry
                         .requestMatchers("/").permitAll()
-                        /*.requestMatchers("/pro/tasks").hasAuthority("PRO")*/
-                        /*.requestMatchers("/tasks").hasAuthority("USER")*/
-                        .requestMatchers("/admin/**").hasAuthority("ADMIN")
                         .requestMatchers("/auth/login").permitAll()
+                        .requestMatchers("/test-stand/**").permitAll()
+                        .requestMatchers("/swagger-ui/**", "/swagger-resources/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
                         .anyRequest().authenticated()
         );
 
@@ -67,13 +66,8 @@ public class SecurityConfig {
     }
 }
 
-//add PreAuthorize (2 tasks -> 1 controller)
-//add managers
-//obrabotat` exceptions + logs
-//authority-role
-//final testing
 //tests
-//log
-//swagger
 //validation
+//exc handler
+//schema
 //mega final testing

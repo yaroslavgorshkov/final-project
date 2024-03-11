@@ -61,6 +61,8 @@
         </createTable>
     </changeSet>
 
+
+    <!--password = "password" (for all)-->
     <changeSet id="insert-users-data" author="you">
         <sql>INSERT INTO users (username, password, user_role) VALUES
                                                                    ('user1', '$2a$10$aVljD5fETQVRIvJ8M8LQguuutKJ/69zjYp.6sShLwazNqHGqydOw6', 'USER'),
