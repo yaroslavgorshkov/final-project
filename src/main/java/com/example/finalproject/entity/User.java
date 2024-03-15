@@ -2,6 +2,7 @@ package com.example.finalproject.entity;
 
 import com.example.finalproject.util.UserRole;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -20,18 +21,21 @@ import java.util.List;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Schema(description = "Id of the user")
     private Long id;
 
     @NotBlank(message = "Username must not be blank")
-    @Size(min = 5, max = 20, message = "Username length must be less than 20 and bigger than 5")
+    @Size(min = 5, max = 20, message = "Username length must be less than 20 and bigger than 5 characters")
+    @Schema(description = "Username of the user", minLength = 5, maxLength = 20)
     private String username;
 
     @NotBlank(message = "Password must not be blank")
-    @Size(min = 5, max = 20, message = "Password length must be less than 20 and bigger than 5")
+    @Size(min = 5, max = 100, message = "Password length must be less than 100 and bigger than 5 characters")
+    @Schema(description = "Password of the user", minLength = 5, maxLength = 100)
     private String password;
 
     @Enumerated(EnumType.STRING)
-    @NotBlank(message = "User role must not be blank")
+    @Schema(description = "Role of the user", example = "ADMIN")
     private UserRole userRole;
 
     @JsonIgnore

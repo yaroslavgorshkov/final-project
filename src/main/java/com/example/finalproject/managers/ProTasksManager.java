@@ -1,31 +1,25 @@
 package com.example.finalproject.managers;
 
 import com.example.finalproject.dto.ProTaskCreationDto;
-import com.example.finalproject.dto.TaskCreationDto;
 import com.example.finalproject.dto.TaskStatusUpdateDto;
 import com.example.finalproject.entity.ProTask;
-import com.example.finalproject.entity.Task;
 import com.example.finalproject.entity.User;
+import com.example.finalproject.exceptions.AppError;
 import com.example.finalproject.services.ProTaskService;
-import com.example.finalproject.services.TaskService;
 import com.example.finalproject.services.UserService;
 import com.example.finalproject.util.TaskStatus;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -35,7 +29,7 @@ public class ProTasksManager {
     private final ProTaskService proTaskService;
     private final UserService userService;
 
-    public ResponseEntity<List<ProTask>> getAllProTasks(Principal principal) {
+    public ResponseEntity<?> getAllProTasks(Principal principal) {
         String username = principal.getName();
         Optional<User> user = userService.findByUsername(username);
         try {
@@ -44,11 +38,11 @@ public class ProTasksManager {
             return ResponseEntity.ok(allProTasksByUserId);
         } catch (Exception e) {
             log.warn("User has not found: {}", username, e);
-            return ResponseEntity.badRequest().build();
+            return new ResponseEntity<>(new AppError(HttpStatus.BAD_REQUEST.value(), e.getMessage()), HttpStatus.BAD_REQUEST);
         }
     }
 
-    public ResponseEntity<ProTask> addProTask(@RequestBody ProTaskCreationDto proTaskDto, Principal principal) {
+    public ResponseEntity<?> addProTask(@Valid ProTaskCreationDto proTaskDto, Principal principal) {
         String username = principal.getName();
         Optional<User> user = userService.findByUsername(username);
 
@@ -61,24 +55,24 @@ public class ProTasksManager {
             newProTask.setUser(user.get());
         } catch (Exception e) {
             log.warn("User has not found: {}", username, e);
-            return ResponseEntity.badRequest().build();
+            return new ResponseEntity<>(new AppError(HttpStatus.BAD_REQUEST.value(), e.getMessage()), HttpStatus.BAD_REQUEST);
         }
         ProTask savedProTask;
         try {
             savedProTask = proTaskService.saveProTask(newProTask);
         } catch (Exception e) {
             log.warn("Error converting JSON format", e);
-            return ResponseEntity.badRequest().build();
+            return new ResponseEntity<>(new AppError(HttpStatus.BAD_REQUEST.value(), e.getMessage()), HttpStatus.BAD_REQUEST);
         }
         log.info("Pro task with id = " + newProTask.getId() + "has successfully created");
         return ResponseEntity.status(HttpStatus.CREATED).body(savedProTask);
     }
 
-    public ResponseEntity<ProTask> updateProTaskStatus(@PathVariable Long taskId, @RequestBody TaskStatusUpdateDto statusDTO, Principal principal) {
+    public ResponseEntity<?> updateProTaskStatus(@PathVariable Long taskId, @RequestBody TaskStatusUpdateDto statusDTO, Principal principal) {
         ProTask existingProTask = proTaskService.getProTaskById(taskId);
         if (existingProTask == null) {
             log.warn("Pro task with id = " + taskId + " has not found");
-            return ResponseEntity.notFound().build();
+            return new ResponseEntity<>(new AppError(HttpStatus.NOT_FOUND.value(), "Pro task with id = " + taskId + " has not found"), HttpStatus.NOT_FOUND);
         }
         String username = principal.getName();
         Optional<User> user = userService.findByUsername(username);
@@ -90,25 +84,25 @@ public class ProTasksManager {
                     updatedProTask = proTaskService.saveProTask(existingProTask);
                 } catch (Exception e) {
                     log.warn("Error converting JSON format", e);
-                    return ResponseEntity.badRequest().build();
+                    return new ResponseEntity<>(new AppError(HttpStatus.BAD_REQUEST.value(), e.getMessage()), HttpStatus.BAD_REQUEST);
                 }
                 log.info("Pro task with id = " + taskId + " has successfully updated");
                 return ResponseEntity.ok(updatedProTask);
             } else {
                 log.warn("Pro task with id = " + taskId + " does not belong to user with id = " + user.get().getId());
-                return ResponseEntity.badRequest().build();
+                return new ResponseEntity<>(new AppError(HttpStatus.BAD_REQUEST.value(), "Pro task with id = " + taskId + " does not belong to user with id = " + user.get().getId()), HttpStatus.BAD_REQUEST);
             }
         } catch (Exception e) {
             log.warn("User has not found: {}", username, e);
-            return ResponseEntity.badRequest().build();
+            return new ResponseEntity<>(new AppError(HttpStatus.BAD_REQUEST.value(), e.getMessage()), HttpStatus.BAD_REQUEST);
         }
     }
 
-    public ResponseEntity<Void> deleteProTask(@PathVariable Long taskId, Principal principal) {
+    public ResponseEntity<?> deleteProTask(@PathVariable Long taskId, Principal principal) {
         ProTask existingProTask = proTaskService.getProTaskById(taskId);
         if (existingProTask == null) {
             log.warn("Pro task with id = " + taskId + " has not found");
-            return ResponseEntity.notFound().build();
+            return new ResponseEntity<>(new AppError(HttpStatus.NOT_FOUND.value(), "Pro task with id = " + taskId + " has not found"), HttpStatus.NOT_FOUND);
         }
         String username = principal.getName();
         Optional<User> user = userService.findByUsername(username);
@@ -119,48 +113,60 @@ public class ProTasksManager {
                 return ResponseEntity.noContent().build();
             } else {
                 log.warn("Pro task with id = " + taskId + " does not belong to user with id = " + user.get().getId());
-                return ResponseEntity.badRequest().build();
+                return new ResponseEntity<>(new AppError(HttpStatus.BAD_REQUEST.value(), "Pro task with id = " + taskId + " does not belong to user with id = " + user.get().getId()), HttpStatus.BAD_REQUEST);
             }
         } catch (Exception e) {
             log.warn("User has not found: {}", username, e);
-            return ResponseEntity.badRequest().build();
+            return new ResponseEntity<>(new AppError(HttpStatus.BAD_REQUEST.value(), e.getMessage()), HttpStatus.BAD_REQUEST);
         }
     }
 
-    public ResponseEntity<List<ProTask>> getTasksSortedByTime(Principal principal) {
+    public ResponseEntity<?> getTasksSortedByTime(Principal principal) {
         String username = principal.getName();
         Optional<User> user = userService.findByUsername(username);
-
-        List<ProTask> sortedTasks = proTaskService.getAllTasksByUserId(user.get().getId())
-                .stream()
-                .sorted(Comparator.comparing(ProTask::getCreationTime))
-                .collect(Collectors.toList());
-
+        List<ProTask> sortedTasks;
+        try {
+            sortedTasks = proTaskService.getAllTasksByUserId(user.get().getId())
+                    .stream()
+                    .sorted(Comparator.comparing(ProTask::getCreationTime))
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            log.warn("User has not found: {}", username, e);
+            return new ResponseEntity<>(new AppError(HttpStatus.BAD_REQUEST.value(), e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
         return ResponseEntity.ok(sortedTasks);
     }
 
-    public ResponseEntity<List<ProTask>> getTasksSortedByDeadline(Principal principal) {
+    public ResponseEntity<?> getTasksSortedByDeadline(Principal principal) {
         String username = principal.getName();
         Optional<User> user = userService.findByUsername(username);
-
-        List<ProTask> inProgressTasks = proTaskService.getAllTasksByUserId(user.get().getId())
-                .stream()
-                .filter(task -> task.getTaskStatus() == TaskStatus.IN_PROGRESS)
-                .sorted(Comparator.comparing(ProTask::getDeadline))
-                .collect(Collectors.toList());
-
+        List<ProTask> inProgressTasks;
+        try {
+            inProgressTasks = proTaskService.getAllTasksByUserId(user.get().getId())
+                    .stream()
+                    .filter(task -> task.getTaskStatus() == TaskStatus.IN_PROGRESS)
+                    .sorted(Comparator.comparing(ProTask::getDeadline))
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            log.warn("User has not found: {}", username, e);
+            return new ResponseEntity<>(new AppError(HttpStatus.BAD_REQUEST.value(), e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
         return ResponseEntity.ok(inProgressTasks);
     }
 
-    public ResponseEntity<List<ProTask>> getExpiredTasks(Principal principal) {
+    public ResponseEntity<?> getExpiredTasks(Principal principal) {
         String username = principal.getName();
         Optional<User> user = userService.findByUsername(username);
-
-        List<ProTask> expiredTasks = proTaskService.getAllTasksByUserId(user.get().getId())
-                .stream()
-                .filter(task -> task.getTaskStatus() == TaskStatus.EXPIRED)
-                .toList();
-
+        List<ProTask> expiredTasks;
+        try {
+            expiredTasks = proTaskService.getAllTasksByUserId(user.get().getId())
+                    .stream()
+                    .filter(task -> task.getTaskStatus() == TaskStatus.EXPIRED)
+                    .toList();
+        } catch (Exception e) {
+            log.warn("User has not found: {}", username, e);
+            return new ResponseEntity<>(new AppError(HttpStatus.BAD_REQUEST.value(), e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
         return ResponseEntity.ok(expiredTasks);
     }
 }

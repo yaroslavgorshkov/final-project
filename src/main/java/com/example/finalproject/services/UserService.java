@@ -1,6 +1,5 @@
 package com.example.finalproject.services;
 
-import com.example.finalproject.entity.Task;
 import com.example.finalproject.entity.User;
 import com.example.finalproject.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;

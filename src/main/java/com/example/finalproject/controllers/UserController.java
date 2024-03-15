@@ -2,10 +2,10 @@ package com.example.finalproject.controllers;
 
 import com.example.finalproject.entity.User;
 import com.example.finalproject.managers.UsersManager;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -22,19 +22,19 @@ public class UserController {
 
     @DeleteMapping("/{userId}")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long userId) {
+    public ResponseEntity<?> deleteUser(@PathVariable Long userId) {
         return usersManager.deleteUser(userId);
     }
 
     @PutMapping("/{userId}")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<User> updateUser(@PathVariable Long userId, @RequestBody @Validated User user) {
+    public ResponseEntity<?> updateUser(@PathVariable Long userId, @RequestBody @Valid User user) {
         return usersManager.updateUser(userId, user);
     }
 
     @PostMapping
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<User> addUser(@RequestBody User user) {
+    public ResponseEntity<User> addUser(@RequestBody @Valid User user) {
         return usersManager.addUser(user);
     }
 

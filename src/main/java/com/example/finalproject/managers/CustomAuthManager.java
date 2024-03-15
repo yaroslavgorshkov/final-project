@@ -25,7 +25,7 @@ public class CustomAuthManager {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
         } catch (BadCredentialsException e) {
-            return new ResponseEntity<>(new AppError(HttpStatus.UNAUTHORIZED.value(), "unauth!"), HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(new AppError(HttpStatus.UNAUTHORIZED.value(), "Unauthorized"), HttpStatus.UNAUTHORIZED);
         }
         User user =  userService.loadUserByUsername(request.getUsername());
 

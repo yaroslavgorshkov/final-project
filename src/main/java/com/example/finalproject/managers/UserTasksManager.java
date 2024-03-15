@@ -4,9 +4,11 @@ import com.example.finalproject.dto.TaskCreationDto;
 import com.example.finalproject.dto.TaskStatusUpdateDto;
 import com.example.finalproject.entity.Task;
 import com.example.finalproject.entity.User;
+import com.example.finalproject.exceptions.AppError;
 import com.example.finalproject.services.TaskService;
 import com.example.finalproject.services.UserService;
 import com.example.finalproject.util.TaskStatus;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -25,7 +27,7 @@ public class UserTasksManager {
     private final TaskService taskService;
     private final UserService userService;
 
-    public ResponseEntity<List<Task>> getAllTasks(Principal principal) {
+    public ResponseEntity<?> getAllTasks(Principal principal) {
         String username = principal.getName();
         Optional<User> user = userService.findByUsername(username);
         try {
@@ -34,11 +36,11 @@ public class UserTasksManager {
             return ResponseEntity.ok(allTasksByUserId);
         } catch (Exception e) {
             log.warn("User has not found: {}", username, e);
-            return ResponseEntity.badRequest().build();
+            return new ResponseEntity<>(new AppError(HttpStatus.BAD_REQUEST.value(), e.getMessage()), HttpStatus.BAD_REQUEST);
         }
     }
 
-    public ResponseEntity<Task> addTask(TaskCreationDto taskDto, Principal principal) {
+    public ResponseEntity<?> addTask(@Valid TaskCreationDto taskDto, Principal principal) {
         String username = principal.getName();
         Optional<User> user = userService.findByUsername(username);
 
@@ -49,24 +51,24 @@ public class UserTasksManager {
             newTask.setUser(user.get());
         } catch (Exception e) {
             log.warn("User has not found: {}", username, e);
-            return ResponseEntity.badRequest().build();
+            return new ResponseEntity<>(new AppError(HttpStatus.BAD_REQUEST.value(), e.getMessage()), HttpStatus.BAD_REQUEST);
         }
         Task savedTask;
         try {
             savedTask = taskService.saveTask(newTask);
         } catch (Exception e) {
             log.warn("Error converting JSON format!", e);
-            return ResponseEntity.badRequest().build();
+            return new ResponseEntity<>(new AppError(HttpStatus.BAD_REQUEST.value(), e.getMessage()), HttpStatus.BAD_REQUEST);
         }
         log.info("Task with id = " + newTask.getId() + "has successfully created");
         return ResponseEntity.status(HttpStatus.CREATED).body(savedTask);
     }
 
-    public ResponseEntity<Task> updateTaskStatus(Long taskId, TaskStatusUpdateDto statusDTO, Principal principal) {
+    public ResponseEntity<?> updateTaskStatus(Long taskId, TaskStatusUpdateDto statusDTO, Principal principal) {
         Task existingTask = taskService.getTaskById(taskId);
         if (existingTask == null) {
             log.warn("Task with id = " + taskId + " has not found");
-            return ResponseEntity.notFound().build();
+            return new ResponseEntity<>(new AppError(HttpStatus.NOT_FOUND.value(), "Task with id = " + taskId + " has not found"), HttpStatus.NOT_FOUND);
         }
         String username = principal.getName();
         Optional<User> user = userService.findByUsername(username);
@@ -78,25 +80,25 @@ public class UserTasksManager {
                     updatedTask = taskService.saveTask(existingTask);
                 } catch (Exception e) {
                     log.warn("Error converting JSON format", e);
-                    return ResponseEntity.badRequest().build();
+                    return new ResponseEntity<>(new AppError(HttpStatus.BAD_REQUEST.value(), e.getMessage()), HttpStatus.BAD_REQUEST);
                 }
                 log.info("Task with id = " + taskId + " has successfully updated");
                 return ResponseEntity.ok(updatedTask);
             } else {
                 log.warn("Task with id = " + taskId + " does not belong to user with id = " + user.get().getId());
-                return ResponseEntity.badRequest().build();
+                return new ResponseEntity<>(new AppError(HttpStatus.BAD_REQUEST.value(), "Task with id = " + taskId + " does not belong to user with id = " + user.get().getId()), HttpStatus.BAD_REQUEST);
             }
         } catch (Exception e) {
             log.warn("User has not found: {}", username, e);
-            return ResponseEntity.badRequest().build();
+            return new ResponseEntity<>(new AppError(HttpStatus.BAD_REQUEST.value(), e.getMessage()), HttpStatus.BAD_REQUEST);
         }
     }
 
-    public ResponseEntity<Void> deleteTask(Long taskId, Principal principal) {
+    public ResponseEntity<?> deleteTask(Long taskId, Principal principal) {
         Task existingTask = taskService.getTaskById(taskId);
         if (existingTask == null) {
             log.warn("Task with id = " + taskId + " has not found");
-            return ResponseEntity.notFound().build();
+            return new ResponseEntity<>(new AppError(HttpStatus.NOT_FOUND.value(), "Task with id = " + taskId + " has not found"), HttpStatus.NOT_FOUND);
         }
         String username = principal.getName();
         Optional<User> user = userService.findByUsername(username);
@@ -107,11 +109,11 @@ public class UserTasksManager {
                 return ResponseEntity.noContent().build();
             } else {
                 log.warn("Task with id = " + taskId + " does not belong to user with id = " + user.get().getId());
-                return ResponseEntity.badRequest().build();
+                return new ResponseEntity<>(new AppError(HttpStatus.BAD_REQUEST.value(), "Task with id = " + taskId + " does not belong to user with id = " + user.get().getId()), HttpStatus.BAD_REQUEST);
             }
         } catch (Exception e) {
             log.warn("User has not found: {}", username, e);
-            return ResponseEntity.badRequest().build();
+            return new ResponseEntity<>(new AppError(HttpStatus.BAD_REQUEST.value(), e.getMessage()), HttpStatus.BAD_REQUEST);
         }
     }
 }

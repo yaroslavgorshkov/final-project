@@ -4,6 +4,7 @@ import com.example.finalproject.dto.UserResponseInfoDto;
 import com.example.finalproject.entity.ProTask;
 import com.example.finalproject.entity.Task;
 import com.example.finalproject.entity.User;
+import com.example.finalproject.exceptions.AppError;
 import com.example.finalproject.services.ProTaskService;
 import com.example.finalproject.services.TaskService;
 import com.example.finalproject.services.UserService;
@@ -44,22 +45,22 @@ public class UsersManager {
         return new UserResponseInfoDto(user.getId(), user.getUsername(), user.getUserRole());
     }
 
-    public ResponseEntity<Void> deleteUser(Long userId) {
+    public ResponseEntity<?> deleteUser(Long userId) {
         User existingUser = userService.getUserById(userId);
         if (existingUser == null) {
             log.warn("User with id = " + userId + " has not found");
-            return ResponseEntity.notFound().build();
+            return new ResponseEntity<>(new AppError(HttpStatus.NOT_FOUND.value(), "User with id = " + userId + " has not found"), HttpStatus.NOT_FOUND);
         }
         userService.deleteUserById(userId);
         log.info("Successfully deleted user with id = " + userId);
         return ResponseEntity.noContent().build();
     }
 
-    public ResponseEntity<User> updateUser(Long userId, User user) {
+    public ResponseEntity<?> updateUser(Long userId, User user) {
         User existingUser = userService.getUserById(userId);
         if (existingUser == null) {
             log.warn("User with id = " + userId + " has not found");
-            return ResponseEntity.notFound().build();
+            return new ResponseEntity<>(new AppError(HttpStatus.NOT_FOUND.value(), "User with id = " + userId + " has not found"), HttpStatus.NOT_FOUND);
         }
         user.setId(userId);
         User updatedUser = userService.saveUser(user);
@@ -69,12 +70,7 @@ public class UsersManager {
 
     public ResponseEntity<User> addUser(User user) {
         User newUser;
-        try {
-            newUser = userService.saveUser(user);
-        } catch (Exception e) {
-            log.warn("Error converting JSON format", e);
-            return ResponseEntity.badRequest().build();
-        }
+        newUser = userService.saveUser(user);
         log.info("Successfully saved user with id = " + newUser.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(newUser);
     }
