@@ -129,7 +129,7 @@ class UsersManagerTest {
     }
 
     @Test
-    void getUsersStatistics_ValidData_Success() {
+    void UsersManagerTest_getUserStatistics_success() {
         List<ProTask> proTasks = Arrays.asList(
                 new ProTask(1L, "task1", TaskStatus.IN_PROGRESS, STANDART_PRO_USER, LocalDateTime.of(2024, 3, 15, 11, 21, 37, 535275000), LocalDateTime.of(2025, 3, 15, 11, 21, 37, 535275000)),
                 new ProTask(2L, "task2", TaskStatus.IN_PROGRESS, STANDART_PRO_USER, LocalDateTime.of(2024, 3, 15, 11, 21, 37, 535275000), LocalDateTime.of(2025, 3, 15, 11, 21, 37, 535275000)),
