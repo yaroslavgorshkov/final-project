@@ -3,9 +3,13 @@ package com.example.finalproject.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class TaskCreationDto {
     @Schema(description = "Task description", example = "Do homework", minLength = 3, maxLength = 200)
     @NotBlank(message = "Description mush not be blank")

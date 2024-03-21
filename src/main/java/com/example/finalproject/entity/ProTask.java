@@ -4,7 +4,9 @@ import com.example.finalproject.util.TaskStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -14,6 +16,8 @@ import java.time.LocalDateTime;
 @Table(name = "pro_tasks")
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class ProTask {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
