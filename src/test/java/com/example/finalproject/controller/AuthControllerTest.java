@@ -1,12 +1,10 @@
-package com.example.finalproject.controllers;
+package com.example.finalproject.controller;
 
 import com.example.finalproject.dto.JwtRequest;
 import com.example.finalproject.dto.JwtResponse;
-import com.example.finalproject.exceptions.AppError;
-import com.example.finalproject.managers.CustomAuthManager;
+import com.example.finalproject.manager.CustomAuthManager;
 import com.example.finalproject.util.JwtTokenUtils;
 import com.example.finalproject.util.ObjectMapperUtil;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -33,7 +31,7 @@ public class AuthControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
+    @MockBean
     private JwtTokenUtils jwtTokenUtils;
 
     @MockBean

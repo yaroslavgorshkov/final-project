@@ -1,12 +1,12 @@
-package com.example.finalproject.managers;
+package com.example.finalproject.manager;
 
 import com.example.finalproject.dto.ProTaskCreationDto;
 import com.example.finalproject.dto.TaskStatusUpdateDto;
 import com.example.finalproject.entity.ProTask;
 import com.example.finalproject.entity.User;
-import com.example.finalproject.exceptions.AppError;
-import com.example.finalproject.services.ProTaskService;
-import com.example.finalproject.services.UserService;
+import com.example.finalproject.exception.AppError;
+import com.example.finalproject.service.ProTaskService;
+import com.example.finalproject.service.UserService;
 import com.example.finalproject.util.TaskStatus;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

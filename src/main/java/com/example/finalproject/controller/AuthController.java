@@ -1,7 +1,7 @@
-package com.example.finalproject.controllers;
+package com.example.finalproject.controller;
 
 import com.example.finalproject.dto.JwtRequest;
-import com.example.finalproject.managers.CustomAuthManager;
+import com.example.finalproject.manager.CustomAuthManager;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

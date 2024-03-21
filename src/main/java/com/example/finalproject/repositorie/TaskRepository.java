@@ -1,4 +1,4 @@
-package com.example.finalproject.repositories;
+package com.example.finalproject.repositorie;
 
 import com.example.finalproject.entity.Task;
 import org.springframework.data.jpa.repository.JpaRepository;

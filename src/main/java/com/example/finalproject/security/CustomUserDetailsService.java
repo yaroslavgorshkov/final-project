@@ -1,7 +1,7 @@
 package com.example.finalproject.security;
 
 import com.example.finalproject.entity.User;
-import com.example.finalproject.services.UserService;
+import com.example.finalproject.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;

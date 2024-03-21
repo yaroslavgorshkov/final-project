@@ -1,4 +1,4 @@
-package com.example.finalproject.exceptions;
+package com.example.finalproject.exception;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;

@@ -1,7 +1,7 @@
-package com.example.finalproject.services;
+package com.example.finalproject.service;
 
 import com.example.finalproject.entity.User;
-import com.example.finalproject.repositories.UserRepository;
+import com.example.finalproject.repositorie.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

@@ -1,8 +1,8 @@
-package com.example.finalproject.managers;
+package com.example.finalproject.manager;
 
 import com.example.finalproject.dto.JwtRequest;
 import com.example.finalproject.dto.JwtResponse;
-import com.example.finalproject.exceptions.AppError;
+import com.example.finalproject.exception.AppError;
 import com.example.finalproject.security.CustomUserDetailsService;
 import com.example.finalproject.util.JwtTokenUtils;
 import lombok.RequiredArgsConstructor;

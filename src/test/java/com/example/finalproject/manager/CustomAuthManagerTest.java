@@ -1,4 +1,4 @@
-package com.example.finalproject.managers;
+package com.example.finalproject.manager;
 
 import com.example.finalproject.dto.JwtRequest;
 import com.example.finalproject.dto.JwtResponse;
@@ -20,7 +20,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -58,7 +57,8 @@ class CustomAuthManagerTest {
 
         String expectedToken = "token";
 
-        doNothing().when(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+                .thenReturn(null);
         when(userService.loadUserByUsername("username")).thenReturn(user);
         when(jwtTokenUtils.generateToken(user)).thenReturn(expectedToken);
 

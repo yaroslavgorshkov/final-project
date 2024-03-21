@@ -1,7 +1,6 @@
-package com.example.finalproject.repositories;
+package com.example.finalproject.repositorie;
 
 import com.example.finalproject.entity.ProTask;
-import com.example.finalproject.entity.Task;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

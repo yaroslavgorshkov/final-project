@@ -1,4 +1,4 @@
-package com.example.finalproject.configs;
+package com.example.finalproject.config;
 
 import com.example.finalproject.security.CustomUserDetailsService;
 import com.example.finalproject.security.JwtRequestFilter;

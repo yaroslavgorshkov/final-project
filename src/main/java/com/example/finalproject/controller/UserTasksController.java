@@ -1,21 +1,18 @@
-package com.example.finalproject.controllers;
+package com.example.finalproject.controller;
 
 import com.example.finalproject.dto.ProTaskCreationDto;
 import com.example.finalproject.dto.TaskCreationDto;
 import com.example.finalproject.dto.TaskStatusUpdateDto;
-import com.example.finalproject.entity.ProTask;
-import com.example.finalproject.managers.ProTasksManager;
-import com.example.finalproject.managers.UserTasksManager;
+import com.example.finalproject.manager.ProTasksManager;
+import com.example.finalproject.manager.UserTasksManager;
 import com.example.finalproject.util.RoleIdentifier;
 import com.example.finalproject.util.TaskCreationUtils;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.util.*;
 
 @RestController
 @RequestMapping("/v1/api/tasks")

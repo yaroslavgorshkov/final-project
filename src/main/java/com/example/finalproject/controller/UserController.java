@@ -1,7 +1,7 @@
-package com.example.finalproject.controllers;
+package com.example.finalproject.controller;
 
 import com.example.finalproject.entity.User;
-import com.example.finalproject.managers.UsersManager;
+import com.example.finalproject.manager.UsersManager;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

@@ -1,12 +1,13 @@
-package com.example.finalproject.managers;
+package com.example.finalproject.manager;
 
 import com.example.finalproject.dto.UserResponseInfoDto;
 import com.example.finalproject.entity.ProTask;
 import com.example.finalproject.entity.Task;
 import com.example.finalproject.entity.User;
-import com.example.finalproject.services.ProTaskService;
-import com.example.finalproject.services.TaskService;
-import com.example.finalproject.services.UserService;
+import com.example.finalproject.service.ProTaskService;
+import com.example.finalproject.service.TaskService;
+import com.example.finalproject.service.UserService;
+import com.example.finalproject.util.JwtTokenUtils;
 import com.example.finalproject.util.TaskStatus;
 import com.example.finalproject.util.UserRole;
 import org.junit.jupiter.api.Test;
@@ -18,7 +19,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @WebMvcTest(UsersManager.class)
@@ -40,6 +39,9 @@ class UsersManagerTest {
     private ProTaskService proTaskService;
     @MockBean
     private TaskService taskService;
+
+    @MockBean
+    private JwtTokenUtils jwtTokenUtils;
 
     @Autowired
     private UsersManager usersManager;
@@ -64,7 +66,6 @@ class UsersManagerTest {
     void UsersManagerTest_deleteUser_success() {
         Long userId = 1L;
         when(userService.getUserById(userId)).thenReturn(STANDART_USER);
-        /*doNothing().when(userService).deleteUserById(userId);*/
 
         ResponseEntity<?> response = usersManager.deleteUser(userId);
 
@@ -131,9 +132,9 @@ class UsersManagerTest {
     @Test
     void UsersManagerTest_getUserStatistics_success() {
         List<ProTask> proTasks = Arrays.asList(
-                new ProTask(1L, "task1", TaskStatus.IN_PROGRESS, STANDART_PRO_USER, LocalDateTime.of(2024, 3, 15, 11, 21, 37, 535275000), LocalDateTime.of(2025, 3, 15, 11, 21, 37, 535275000)),
+                new ProTask(1L, "task1", TaskStatus.COMPLETED, STANDART_PRO_USER, LocalDateTime.of(2024, 3, 15, 11, 21, 37, 535275000), LocalDateTime.of(2025, 3, 15, 11, 21, 37, 535275000)),
                 new ProTask(2L, "task2", TaskStatus.IN_PROGRESS, STANDART_PRO_USER, LocalDateTime.of(2024, 3, 15, 11, 21, 37, 535275000), LocalDateTime.of(2025, 3, 15, 11, 21, 37, 535275000)),
-                new ProTask(3L, "task3", TaskStatus.IN_PROGRESS, STANDART_PRO_USER, LocalDateTime.of(2024, 3, 15, 11, 21, 37, 535275000), LocalDateTime.of(2025, 3, 15, 11, 21, 37, 535275000))
+                new ProTask(3L, "task3", TaskStatus.EXPIRED, STANDART_PRO_USER, LocalDateTime.of(2024, 3, 15, 11, 21, 37, 535275000), LocalDateTime.of(2025, 3, 15, 11, 21, 37, 535275000))
         );
         List<Task> tasks = Arrays.asList(
                 new Task(1L, "task4", TaskStatus.COMPLETED, STANDART_USER),
@@ -141,6 +142,23 @@ class UsersManagerTest {
                 new Task(3L, "task6", TaskStatus.EXPIRED, STANDART_USER)
         );
 
+        List<User> users = Arrays.asList(
+                STANDART_USER,
+                STANDART_PRO_USER
+        );
 
+        when(userService.getAllUsers()).thenReturn(users);
+        when(proTaskService.getAllProTasks()).thenReturn(proTasks);
+        when(taskService.getAllTasks()).thenReturn(tasks);
+
+        String statistics = usersManager.getUsersStatistics();
+
+        assertTrue(statistics.contains("Amount of users: 2"));
+        assertTrue(statistics.contains("with PRO status: 1"));
+        assertTrue(statistics.contains("with ADMIN status: 0"));
+        assertTrue(statistics.contains("Amount of tasks: 6"));
+        assertTrue(statistics.contains("COMPLETED: 2"));
+        assertTrue(statistics.contains("IN PROGRESS: 2"));
+        assertTrue(statistics.contains("EXPIRED: 2"));
     }
 }

@@ -1,7 +1,7 @@
 package com.example.finalproject.security;
 
 import com.example.finalproject.entity.User;
-import com.example.finalproject.services.UserService;
+import com.example.finalproject.service.UserService;
 import com.example.finalproject.util.UserRole;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

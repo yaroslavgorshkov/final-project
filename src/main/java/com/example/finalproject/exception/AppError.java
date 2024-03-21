@@ -1,4 +1,4 @@
-package com.example.finalproject.exceptions;
+package com.example.finalproject.exception;
 
 import lombok.Data;
 

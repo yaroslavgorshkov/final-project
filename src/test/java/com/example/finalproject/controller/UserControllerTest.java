@@ -1,8 +1,8 @@
-package com.example.finalproject.controllers;
+package com.example.finalproject.controller;
 
 import com.example.finalproject.dto.UserResponseInfoDto;
 import com.example.finalproject.entity.User;
-import com.example.finalproject.managers.UsersManager;
+import com.example.finalproject.manager.UsersManager;
 import com.example.finalproject.util.ObjectMapperUtil;
 import com.example.finalproject.util.UserRole;
 import org.junit.jupiter.api.Test;
@@ -69,7 +69,7 @@ class UserControllerTest {
         Long userId = 1L;
         User user = User.builder().id(userId).username("user1").password("password1").userRole(UserRole.USER).build();
 
-        when(usersManager.updateUser(userId, user)).thenReturn(ResponseEntity.status(HttpStatus.OK).body(user));
+        when(usersManager.updateUser(userId, user)).thenReturn(ResponseEntity.ok(user));
 
         mockMvc.perform(MockMvcRequestBuilders.put("/v1/api/admin/users/{userId}", userId)
                         .contentType(MediaType.APPLICATION_JSON)
