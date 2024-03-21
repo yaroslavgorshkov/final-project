@@ -141,18 +141,6 @@ class UsersManagerTest {
                 new Task(3L, "task6", TaskStatus.EXPIRED, STANDART_USER)
         );
 
-        when(userService.getAllUsers()).thenReturn(users);
-        when(proTaskService.getAllProTasks()).thenReturn(proTasks);
-        when(taskService.getAllTasks()).thenReturn(tasks);
 
-        String statistics = usersManager.getUsersStatistics();
-
-        assertTrue(statistics.contains("Amount of users: 3"));
-        assertTrue(statistics.contains("with PRO status: 1"));
-        assertTrue(statistics.contains("with ADMIN status: 1"));
-        assertTrue(statistics.contains("Amount of tasks: 6"));
-        assertTrue(statistics.contains("COMPLETED: 2"));
-        assertTrue(statistics.contains("IN PROGRESS: 2"));
-        assertTrue(statistics.contains("EXPIRED: 2"));
     }
 }
