@@ -5,6 +5,7 @@ import com.example.finalproject.entity.ProTask;
 import com.example.finalproject.entity.Task;
 import com.example.finalproject.entity.User;
 import com.example.finalproject.exception.AppError;
+import com.example.finalproject.exception.CustomUserHasNotFoundException;
 import com.example.finalproject.service.ProTaskService;
 import com.example.finalproject.service.TaskService;
 import com.example.finalproject.service.UserService;
@@ -27,12 +28,12 @@ public class UsersManager {
     private final ProTaskService proTaskService;
     private final TaskService taskService;
 
-    public ResponseEntity<List<UserResponseInfoDto>> getAllUsers() {
+    public List<UserResponseInfoDto> getAllUsers() {
         List<User> users = userService.getAllUsers();
         List<UserResponseInfoDto> userResponseInfoDtoList =
                 usersToUserResponseInfoDtoConverter(users);
         log.info("Successfully gotten task list for admin");
-        return ResponseEntity.ok(userResponseInfoDtoList);
+        return userResponseInfoDtoList;
     }
 
     private List<UserResponseInfoDto> usersToUserResponseInfoDtoConverter(List<User> users) {
@@ -45,34 +46,31 @@ public class UsersManager {
         return new UserResponseInfoDto(user.getId(), user.getUsername(), user.getUserRole());
     }
 
-    public ResponseEntity<?> deleteUser(Long userId) {
+    public void deleteUser(Long userId) {
         User existingUser = userService.getUserById(userId);
         if (existingUser == null) {
-            log.warn("User with id = " + userId + " has not found");
-            return new ResponseEntity<>(new AppError(HttpStatus.NOT_FOUND.value(), "User with id = " + userId + " has not found"), HttpStatus.NOT_FOUND);
+            throw new CustomUserHasNotFoundException("User with id = " + userId + " has not found");
         }
         userService.deleteUserById(userId);
         log.info("Successfully deleted user with id = " + userId);
-        return ResponseEntity.noContent().build();
     }
 
-    public ResponseEntity<?> updateUser(Long userId, User user) {
+    public User updateUser(Long userId, User user) {
         User existingUser = userService.getUserById(userId);
         if (existingUser == null) {
-            log.warn("User with id = " + userId + " has not found");
-            return new ResponseEntity<>(new AppError(HttpStatus.NOT_FOUND.value(), "User with id = " + userId + " has not found"), HttpStatus.NOT_FOUND);
+            throw new CustomUserHasNotFoundException("User with id = " + userId + " has not found");
         }
         user.setId(userId);
         User updatedUser = userService.saveUser(user);
         log.info("Successfully updated user with id = " + userId);
-        return ResponseEntity.ok(updatedUser);
+        return updatedUser;
     }
 
-    public ResponseEntity<User> addUser(User user) {
+    public User addUser(User user) {
         User newUser;
         newUser = userService.saveUser(user);
         log.info("Successfully saved user with id = " + newUser.getId());
-        return ResponseEntity.status(HttpStatus.CREATED).body(newUser);
+        return newUser;
     }
 
     public String getUsersStatistics() {

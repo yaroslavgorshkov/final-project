@@ -5,6 +5,8 @@ import com.example.finalproject.dto.TaskStatusUpdateDto;
 import com.example.finalproject.entity.ProTask;
 import com.example.finalproject.entity.User;
 import com.example.finalproject.exception.AppError;
+import com.example.finalproject.exception.CustomErrorJsonParseException;
+import com.example.finalproject.exception.CustomUserHasNotFoundException;
 import com.example.finalproject.service.ProTaskService;
 import com.example.finalproject.service.UserService;
 import com.example.finalproject.util.TaskStatus;
@@ -29,20 +31,19 @@ public class ProTasksManager {
     private final ProTaskService proTaskService;
     private final UserService userService;
 
-    public ResponseEntity<?> getAllProTasks(Principal principal) {
+    public List<ProTask> getAllProTasks(Principal principal) {
         String username = principal.getName();
         Optional<User> user = userService.findByUsername(username);
         try {
             List<ProTask> allProTasksByUserId = proTaskService.getAllTasksByUserId(user.get().getId());
             log.info("Successfully gotten Pro task list for user with id = " + user.get().getId());
-            return ResponseEntity.ok(allProTasksByUserId);
+            return allProTasksByUserId;
         } catch (Exception e) {
-            log.warn("User has not found: {}", username, e);
-            return new ResponseEntity<>(new AppError(HttpStatus.BAD_REQUEST.value(), e.getMessage()), HttpStatus.BAD_REQUEST);
+            throw new CustomUserHasNotFoundException("User has not found");
         }
     }
 
-    public ResponseEntity<?> addProTask(@Valid ProTaskCreationDto proTaskDto, Principal principal) {
+    public ProTask addProTask(@Valid ProTaskCreationDto proTaskDto, Principal principal) {
         String username = principal.getName();
         Optional<User> user = userService.findByUsername(username);
 
@@ -54,18 +55,16 @@ public class ProTasksManager {
         try {
             newProTask.setUser(user.get());
         } catch (Exception e) {
-            log.warn("User has not found: {}", username, e);
-            return new ResponseEntity<>(new AppError(HttpStatus.BAD_REQUEST.value(), e.getMessage()), HttpStatus.BAD_REQUEST);
+            throw new CustomUserHasNotFoundException("User has not found");
         }
         ProTask savedProTask;
         try {
             savedProTask = proTaskService.saveProTask(newProTask);
         } catch (Exception e) {
-            log.warn("Error converting JSON format", e);
-            return new ResponseEntity<>(new AppError(HttpStatus.BAD_REQUEST.value(), e.getMessage()), HttpStatus.BAD_REQUEST);
+            throw new CustomErrorJsonParseException("Error converting JSON format");
         }
         log.info("Pro task with id = " + newProTask.getId() + "has successfully created");
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedProTask);
+        return savedProTask;
     }
 
     public ResponseEntity<?> updateProTaskStatus(@PathVariable Long taskId, @RequestBody TaskStatusUpdateDto statusDTO, Principal principal) {

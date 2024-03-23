@@ -1,7 +1,7 @@
 package com.example.finalproject.service;
 
 import com.example.finalproject.entity.ProTask;
-import com.example.finalproject.repositorie.ProTaskRepository;
+import com.example.finalproject.repository.ProTaskRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

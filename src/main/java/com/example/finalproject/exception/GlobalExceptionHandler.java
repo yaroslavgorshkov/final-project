@@ -5,9 +5,12 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+
+import java.time.format.DateTimeParseException;
 
 @ControllerAdvice
 @Slf4j
@@ -27,5 +30,29 @@ public class GlobalExceptionHandler {
     public ResponseEntity<AppError> handleHttpMessageNotReadable(HttpMessageNotReadableException e) {
         log.warn(e.getMessage());
         return new ResponseEntity<>(new AppError(HttpStatus.BAD_REQUEST.value(), e.getMessage()), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<AppError> handleBadCredentials(BadCredentialsException e) {
+        log.warn(e.getMessage());
+        return new ResponseEntity<>(new AppError(HttpStatus.UNAUTHORIZED.value(), "Unauthorized"), HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(CustomUserHasNotFoundException.class)
+    public ResponseEntity<AppError> handleCustomUserHasNotFound(CustomUserHasNotFoundException e) {
+        log.warn(e.getMessage());
+        return new ResponseEntity<>(new AppError(HttpStatus.NOT_FOUND.value(), e.getMessage()), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(CustomErrorJsonParseException.class)
+    public ResponseEntity<AppError> handleCustomErrorJsonParse(CustomErrorJsonParseException e) {
+        log.warn(e.getMessage());
+        return new ResponseEntity<>(new AppError(HttpStatus.NOT_FOUND.value(), e.getMessage()), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(DateTimeParseException.class)
+    public ResponseEntity<AppError> handleDateTimeParse(DateTimeParseException e) {
+        log.warn(e.getMessage());
+        return new ResponseEntity<>(new AppError(HttpStatus.NOT_FOUND.value(), e.getMessage()), HttpStatus.NOT_FOUND);
     }
 }

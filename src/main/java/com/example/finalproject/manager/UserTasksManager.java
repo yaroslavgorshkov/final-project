@@ -5,6 +5,8 @@ import com.example.finalproject.dto.TaskStatusUpdateDto;
 import com.example.finalproject.entity.Task;
 import com.example.finalproject.entity.User;
 import com.example.finalproject.exception.AppError;
+import com.example.finalproject.exception.CustomErrorJsonParseException;
+import com.example.finalproject.exception.CustomUserHasNotFoundException;
 import com.example.finalproject.service.TaskService;
 import com.example.finalproject.service.UserService;
 import com.example.finalproject.util.TaskStatus;
@@ -27,20 +29,19 @@ public class UserTasksManager {
     private final TaskService taskService;
     private final UserService userService;
 
-    public ResponseEntity<?> getAllTasks(Principal principal) {
+    public List<Task> getAllTasks(Principal principal) {
         String username = principal.getName();
         Optional<User> user = userService.findByUsername(username);
         try {
             List<Task> allTasksByUserId = taskService.getAllTasksByUserId(user.get().getId());
             log.info("Successfully gotten task list for user with id = " + user.get().getId());
-            return ResponseEntity.ok(allTasksByUserId);
+            return allTasksByUserId;
         } catch (Exception e) {
-            log.warn("User has not found: {}", username, e);
-            return new ResponseEntity<>(new AppError(HttpStatus.BAD_REQUEST.value(), e.getMessage()), HttpStatus.BAD_REQUEST);
+            throw new CustomUserHasNotFoundException("User has not found");
         }
     }
 
-    public ResponseEntity<?> addTask(@Valid TaskCreationDto taskDto, Principal principal) {
+    public Task addTask(@Valid TaskCreationDto taskDto, Principal principal) {
         String username = principal.getName();
         Optional<User> user = userService.findByUsername(username);
 
@@ -50,18 +51,16 @@ public class UserTasksManager {
         try {
             newTask.setUser(user.get());
         } catch (Exception e) {
-            log.warn("User has not found: {}", username, e);
-            return new ResponseEntity<>(new AppError(HttpStatus.BAD_REQUEST.value(), e.getMessage()), HttpStatus.BAD_REQUEST);
+            throw new CustomUserHasNotFoundException("User has not found");
         }
         Task savedTask;
         try {
             savedTask = taskService.saveTask(newTask);
         } catch (Exception e) {
-            log.warn("Error converting JSON format!", e);
-            return new ResponseEntity<>(new AppError(HttpStatus.BAD_REQUEST.value(), e.getMessage()), HttpStatus.BAD_REQUEST);
+            throw new CustomErrorJsonParseException("Error converting JSON format");
         }
         log.info("Task with id = " + newTask.getId() + "has successfully created");
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedTask);
+        return savedTask;
     }
 
     public ResponseEntity<?> updateTaskStatus(Long taskId, TaskStatusUpdateDto statusDTO, Principal principal) {

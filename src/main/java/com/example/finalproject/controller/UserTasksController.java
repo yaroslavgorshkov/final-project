@@ -8,11 +8,13 @@ import com.example.finalproject.manager.UserTasksManager;
 import com.example.finalproject.util.RoleIdentifier;
 import com.example.finalproject.util.TaskCreationUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.List;
 
 @RestController
 @RequestMapping("/v1/api/tasks")
@@ -26,9 +28,9 @@ public class UserTasksController {
     public ResponseEntity<?> getAllTasks(Principal principal) {
         boolean isPro = RoleIdentifier.isPro(principal);
         if(isPro) {
-            return proTasksManager.getAllProTasks(principal);
+            return new ResponseEntity<>(proTasksManager.getAllProTasks(principal), HttpStatus.OK);
         }
-        return userTasksManager.getAllTasks(principal);
+        return new ResponseEntity<>(userTasksManager.getAllTasks(principal), HttpStatus.OK);
     }
 
     @PostMapping
@@ -37,10 +39,11 @@ public class UserTasksController {
         boolean isPro = RoleIdentifier.isPro(principal);
         if(isPro) {
             ProTaskCreationDto proTaskCreationDto = TaskCreationUtils.getProTaskCreationDto(taskDto);
-            return proTasksManager.addProTask(proTaskCreationDto, principal);
+            return new ResponseEntity<>(proTasksManager.addProTask(proTaskCreationDto, principal), HttpStatus.CREATED);
+
         } else {
             TaskCreationDto taskCreationDto = TaskCreationUtils.getTaskCreationDto(taskDto);
-            return userTasksManager.addTask(taskCreationDto, principal);
+            return new ResponseEntity<>(userTasksManager.addTask(taskCreationDto, principal), HttpStatus.CREATED);
         }
     }
 

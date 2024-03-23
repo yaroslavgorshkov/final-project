@@ -4,6 +4,8 @@ import com.example.finalproject.dto.JwtRequest;
 import com.example.finalproject.manager.CustomAuthManager;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,6 +20,6 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> createAuthToken(@RequestBody @Valid JwtRequest request) {
-        return customAuthManager.createAuthToken(request);
+        return new ResponseEntity<>(customAuthManager.createAuthToken(request), HttpStatus.OK);
     }
 }

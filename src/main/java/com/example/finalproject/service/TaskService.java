@@ -1,7 +1,7 @@
 package com.example.finalproject.service;
 
 import com.example.finalproject.entity.Task;
-import com.example.finalproject.repositorie.TaskRepository;
+import com.example.finalproject.repository.TaskRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
