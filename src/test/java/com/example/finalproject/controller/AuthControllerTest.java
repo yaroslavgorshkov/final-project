@@ -1,4 +1,3 @@
-/*
 package com.example.finalproject.controller;
 
 import com.example.finalproject.dto.JwtRequest;
@@ -13,12 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -42,7 +39,7 @@ public class AuthControllerTest {
     void testCreateAuthToken_ValidRequest_ReturnsToken() throws Exception {
         JwtRequest request = new JwtRequest("username", "password");
         String token = "generated_token";
-        doReturn(ResponseEntity.ok(new JwtResponse(token))).when(customAuthManager).createAuthToken(any());
+        doReturn(new JwtResponse(token)).when(customAuthManager).createAuthToken(request);
 
         mockMvc.perform(post("/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -54,7 +51,7 @@ public class AuthControllerTest {
     @Test
     void AuthControllerTest_createAuthToken_Unauthorized() throws Exception {
         JwtRequest request = new JwtRequest("invalid_username", "invalid_password");
-        when(customAuthManager.createAuthToken(request)).thenReturn(new ResponseEntity<>(HttpStatus.UNAUTHORIZED));
+        when(customAuthManager.createAuthToken(request)).thenThrow(new BadCredentialsException("Unauthorized"));
 
         mockMvc.perform(post("/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -62,4 +59,3 @@ public class AuthControllerTest {
                 .andExpect(status().isUnauthorized());
     }
 }
-*/

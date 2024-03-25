@@ -4,13 +4,11 @@ import com.example.finalproject.util.TaskStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 @Table(name = "pro_tasks")
@@ -18,6 +16,7 @@ import java.time.LocalDateTime;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class ProTask {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -47,4 +46,12 @@ public class ProTask {
     @DateTimeFormat(pattern = "yyyy-MM-dd-HH")
     @Schema(description = "Task deadline", example = "2024-03-26 12:21:37.535275")
     private LocalDateTime deadline;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ProTask proTask = (ProTask) o;
+        return Objects.equals(description, proTask.description) && taskStatus == proTask.taskStatus && Objects.equals(user, proTask.user) && Objects.equals(deadline, proTask.deadline);
+    }
 }

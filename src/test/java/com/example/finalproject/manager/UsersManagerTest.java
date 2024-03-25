@@ -1,10 +1,10 @@
-/*
 package com.example.finalproject.manager;
 
 import com.example.finalproject.dto.UserResponseInfoDto;
 import com.example.finalproject.entity.ProTask;
 import com.example.finalproject.entity.Task;
 import com.example.finalproject.entity.User;
+import com.example.finalproject.exception.CustomUserHasNotFoundException;
 import com.example.finalproject.service.ProTaskService;
 import com.example.finalproject.service.TaskService;
 import com.example.finalproject.service.UserService;
@@ -18,13 +18,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -47,87 +45,61 @@ class UsersManagerTest {
     @Autowired
     private UsersManager usersManager;
     private static final User STANDART_USER = User.builder().id(1L).username("user1").password("password1").userRole(UserRole.USER).build();
-    private static final User STANDART_PRO_USER = User.builder().id(1L).username("user2").password("password2").userRole(UserRole.PRO).build();
+    private static final User STANDART_PRO_USER = User.builder().id(2L).username("user2").password("password2").userRole(UserRole.PRO).build();
 
     @Test
     void UsersManagerTest_getAllUsers_success() {
-        List<User> users = List.of(
-                STANDART_USER,
-                STANDART_PRO_USER
-        );
+        List<User> users = new ArrayList<>();
+        users.add(STANDART_USER);
+        users.add(STANDART_PRO_USER);
+
+        List<UserResponseInfoDto> expectedUserResponseInfoDtoList = new ArrayList<>();
+        expectedUserResponseInfoDtoList.add(new UserResponseInfoDto(1L, "user1", UserRole.USER));
+        expectedUserResponseInfoDtoList.add(new UserResponseInfoDto(2L, "user2", UserRole.PRO));
+
         when(userService.getAllUsers()).thenReturn(users);
 
-        ResponseEntity<List<UserResponseInfoDto>> response = usersManager.getAllUsers();
+        List<UserResponseInfoDto> actualUserResponseInfoDtoList = usersManager.getAllUsers();
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(users.size(), Objects.requireNonNull(response.getBody()).size());
+        assertEquals(expectedUserResponseInfoDtoList, actualUserResponseInfoDtoList);
     }
 
     @Test
     void UsersManagerTest_deleteUser_success() {
         Long userId = 1L;
         when(userService.getUserById(userId)).thenReturn(STANDART_USER);
-
-        ResponseEntity<?> response = usersManager.deleteUser(userId);
-
-        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+        usersManager.deleteUser(userId);
+        verify(userService, times(1)).deleteUserById(userId);
     }
 
     @Test
-    void UsersManagerTest_deleteUser_UserNotFound() {
+    void UsersManagerTest_deleteUser_userHasNotFound() {
         Long userId = 1L;
         when(userService.getUserById(userId)).thenReturn(null);
-
-        ResponseEntity<?> response = usersManager.deleteUser(userId);
-
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertThrows(CustomUserHasNotFoundException.class, () -> usersManager.deleteUser(userId));
     }
 
     @Test
     void UsersManagerTest_updateUser_success() {
         Long userId = 1L;
-        User user = new User();
-        user.setUsername("updatedUsername");
-        user.setUserRole(UserRole.PRO);
-
-        when(userService.getUserById(userId)).thenReturn(user);
-        when(userService.saveUser(user)).thenReturn(user);
-
-        ResponseEntity<?> response = usersManager.updateUser(userId, user);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertTrue(response.getBody() instanceof User);
-        User updatedUser = (User) response.getBody();
-        assertEquals(user.getUsername(), updatedUser.getUsername());
-        assertEquals(user.getUserRole(), updatedUser.getUserRole());
+        when(userService.getUserById(userId)).thenReturn(STANDART_USER);
+        when(userService.saveUser(STANDART_USER)).thenReturn(STANDART_USER);
+        User actualUser = usersManager.updateUser(userId, STANDART_USER);
+        assertEquals(STANDART_USER, actualUser);
     }
 
     @Test
-    void UsersManagerTest_updateUser_NotFound() {
+    void UsersManagerTest_updateUser_userHasNotFound() {
         Long userId = 1L;
-        User user = new User();
-        user.setUsername("updatedUsername");
-        user.setUserRole(UserRole.PRO);
-
         when(userService.getUserById(userId)).thenReturn(null);
-
-        ResponseEntity<?> response = usersManager.updateUser(userId, user);
-
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertThrows(CustomUserHasNotFoundException.class, () -> usersManager.deleteUser(userId));
     }
 
     @Test
     void UsersManagerTest_addUser_success() {
-        User user = new User();
-        user.setUsername("newUsername");
-        user.setUserRole(UserRole.USER);
-
-        when(userService.saveUser(user)).thenReturn(user);
-
-        ResponseEntity<User> response = usersManager.addUser(user);
-
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        assertEquals(user, response.getBody());
+        when(userService.saveUser(STANDART_USER)).thenReturn(STANDART_USER);
+        User actualUser = usersManager.addUser(STANDART_USER);
+        assertEquals(STANDART_USER, actualUser);
     }
 
     @Test
@@ -162,4 +134,4 @@ class UsersManagerTest {
         assertTrue(statistics.contains("IN PROGRESS: 2"));
         assertTrue(statistics.contains("EXPIRED: 2"));
     }
-}*/
+}

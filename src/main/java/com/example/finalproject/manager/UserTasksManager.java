@@ -4,21 +4,19 @@ import com.example.finalproject.dto.TaskCreationDto;
 import com.example.finalproject.dto.TaskStatusUpdateDto;
 import com.example.finalproject.entity.Task;
 import com.example.finalproject.entity.User;
-import com.example.finalproject.exception.AppError;
-import com.example.finalproject.exception.CustomErrorJsonParseException;
-import com.example.finalproject.exception.CustomUserHasNotFoundException;
+import com.example.finalproject.exception.*;
 import com.example.finalproject.service.TaskService;
 import com.example.finalproject.service.UserService;
 import com.example.finalproject.util.TaskStatus;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -36,7 +34,7 @@ public class UserTasksManager {
             List<Task> allTasksByUserId = taskService.getAllTasksByUserId(user.get().getId());
             log.info("Successfully gotten task list for user with id = " + user.get().getId());
             return allTasksByUserId;
-        } catch (Exception e) {
+        } catch (NoSuchElementException e) {
             throw new CustomUserHasNotFoundException("User has not found");
         }
     }
@@ -50,24 +48,23 @@ public class UserTasksManager {
         newTask.setTaskStatus(TaskStatus.IN_PROGRESS);
         try {
             newTask.setUser(user.get());
-        } catch (Exception e) {
+        } catch (NoSuchElementException e) {
             throw new CustomUserHasNotFoundException("User has not found");
         }
         Task savedTask;
         try {
             savedTask = taskService.saveTask(newTask);
-        } catch (Exception e) {
+        } catch (DataIntegrityViolationException e) {
             throw new CustomErrorJsonParseException("Error converting JSON format");
         }
         log.info("Task with id = " + newTask.getId() + "has successfully created");
         return savedTask;
     }
 
-    public ResponseEntity<?> updateTaskStatus(Long taskId, TaskStatusUpdateDto statusDTO, Principal principal) {
+    public Task updateTaskStatus(Long taskId, TaskStatusUpdateDto statusDTO, Principal principal) {
         Task existingTask = taskService.getTaskById(taskId);
         if (existingTask == null) {
-            log.warn("Task with id = " + taskId + " has not found");
-            return new ResponseEntity<>(new AppError(HttpStatus.NOT_FOUND.value(), "Task with id = " + taskId + " has not found"), HttpStatus.NOT_FOUND);
+            throw new CustomTaskHasNotFoundException("Task with id = " + taskId + " has not found");
         }
         String username = principal.getName();
         Optional<User> user = userService.findByUsername(username);
@@ -77,27 +74,23 @@ public class UserTasksManager {
                 Task updatedTask;
                 try {
                     updatedTask = taskService.saveTask(existingTask);
-                } catch (Exception e) {
-                    log.warn("Error converting JSON format", e);
-                    return new ResponseEntity<>(new AppError(HttpStatus.BAD_REQUEST.value(), e.getMessage()), HttpStatus.BAD_REQUEST);
+                } catch (DataIntegrityViolationException e) {
+                    throw new CustomErrorJsonParseException("Error converting JSON format");
                 }
                 log.info("Task with id = " + taskId + " has successfully updated");
-                return ResponseEntity.ok(updatedTask);
+                return updatedTask;
             } else {
-                log.warn("Task with id = " + taskId + " does not belong to user with id = " + user.get().getId());
-                return new ResponseEntity<>(new AppError(HttpStatus.BAD_REQUEST.value(), "Task with id = " + taskId + " does not belong to user with id = " + user.get().getId()), HttpStatus.BAD_REQUEST);
+                throw new CustomTaskDoesntBelongToUserException("Task with id = " + taskId + " does not belong to user with id = " + user.get().getId());
             }
-        } catch (Exception e) {
-            log.warn("User has not found: {}", username, e);
-            return new ResponseEntity<>(new AppError(HttpStatus.BAD_REQUEST.value(), e.getMessage()), HttpStatus.BAD_REQUEST);
+        } catch (NoSuchElementException e) {
+            throw new CustomUserHasNotFoundException("User has not found");
         }
     }
 
-    public ResponseEntity<?> deleteTask(Long taskId, Principal principal) {
+    public void deleteTask(Long taskId, Principal principal) {
         Task existingTask = taskService.getTaskById(taskId);
         if (existingTask == null) {
-            log.warn("Task with id = " + taskId + " has not found");
-            return new ResponseEntity<>(new AppError(HttpStatus.NOT_FOUND.value(), "Task with id = " + taskId + " has not found"), HttpStatus.NOT_FOUND);
+            throw new CustomTaskHasNotFoundException("Task with id = " + taskId + " has not found");
         }
         String username = principal.getName();
         Optional<User> user = userService.findByUsername(username);
@@ -105,14 +98,11 @@ public class UserTasksManager {
             if (Objects.equals(user.get().getId(), existingTask.getUser().getId())) {
                 taskService.deleteTaskById(taskId);
                 log.info("Task with id" + taskId + " has successfully deleted");
-                return ResponseEntity.noContent().build();
             } else {
-                log.warn("Task with id = " + taskId + " does not belong to user with id = " + user.get().getId());
-                return new ResponseEntity<>(new AppError(HttpStatus.BAD_REQUEST.value(), "Task with id = " + taskId + " does not belong to user with id = " + user.get().getId()), HttpStatus.BAD_REQUEST);
+                throw new CustomTaskDoesntBelongToUserException("Task with id = " + taskId + " does not belong to user with id = " + user.get().getId());
             }
-        } catch (Exception e) {
-            log.warn("User has not found: {}", username, e);
-            return new ResponseEntity<>(new AppError(HttpStatus.BAD_REQUEST.value(), e.getMessage()), HttpStatus.BAD_REQUEST);
+        } catch (NoSuchElementException e) {
+            throw new CustomUserHasNotFoundException("User has not found");
         }
     }
 }

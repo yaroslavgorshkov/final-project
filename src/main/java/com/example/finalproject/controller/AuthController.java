@@ -4,7 +4,6 @@ import com.example.finalproject.dto.JwtRequest;
 import com.example.finalproject.manager.CustomAuthManager;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

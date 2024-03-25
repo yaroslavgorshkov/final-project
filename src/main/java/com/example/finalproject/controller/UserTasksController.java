@@ -3,6 +3,7 @@ package com.example.finalproject.controller;
 import com.example.finalproject.dto.ProTaskCreationDto;
 import com.example.finalproject.dto.TaskCreationDto;
 import com.example.finalproject.dto.TaskStatusUpdateDto;
+import com.example.finalproject.entity.ProTask;
 import com.example.finalproject.manager.ProTasksManager;
 import com.example.finalproject.manager.UserTasksManager;
 import com.example.finalproject.util.RoleIdentifier;
@@ -52,9 +53,9 @@ public class UserTasksController {
     public ResponseEntity<?> updateTaskStatus(@PathVariable Long taskId, @RequestBody TaskStatusUpdateDto statusDTO, Principal principal) {
         boolean isPro = RoleIdentifier.isPro(principal);
         if(isPro) {
-            return proTasksManager.updateProTaskStatus(taskId, statusDTO, principal);
+            return new ResponseEntity<>(proTasksManager.updateProTaskStatus(taskId, statusDTO, principal), HttpStatus.OK);
         }
-        return userTasksManager.updateTaskStatus(taskId, statusDTO, principal);
+        return new ResponseEntity<>(userTasksManager.updateTaskStatus(taskId, statusDTO, principal), HttpStatus.OK);
     }
 
     @DeleteMapping("/{taskId}")
@@ -62,26 +63,29 @@ public class UserTasksController {
     public ResponseEntity<?> deleteTask(@PathVariable Long taskId, Principal principal) {
         boolean isPro = RoleIdentifier.isPro(principal);
         if(isPro) {
-            return proTasksManager.deleteProTask(taskId, principal);
+            proTasksManager.deleteProTask(taskId, principal);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
-        return userTasksManager.deleteTask(taskId, principal);
+        userTasksManager.deleteTask(taskId, principal);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @GetMapping("/by-time")
     @PreAuthorize("hasAuthority('PRO')")
     public ResponseEntity<?> getTasksSortedByTime(Principal principal) {
-        return proTasksManager.getTasksSortedByTime(principal);
+        return new ResponseEntity<>(proTasksManager.getTasksSortedByTime(principal), HttpStatus.OK);
     }
 
     @GetMapping("/deadline-soon")
     @PreAuthorize("hasAuthority('PRO')")
     public ResponseEntity<?> getTasksSortedByDeadline(Principal principal) {
-        return proTasksManager.getTasksSortedByDeadline(principal);
+        return new ResponseEntity<>(proTasksManager.getTasksSortedByDeadline(principal), HttpStatus.OK);
     }
 
     @GetMapping("/expired")
     @PreAuthorize("hasAuthority('PRO')")
     public ResponseEntity<?> getExpiredTasks(Principal principal) {
-        return proTasksManager.getExpiredTasks(principal);
+        List<ProTask> expiredTasks = proTasksManager.getExpiredTasks(principal);
+        return new ResponseEntity<>(expiredTasks, HttpStatus.OK);
     }
 }

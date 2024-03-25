@@ -1,4 +1,3 @@
-/*
 package com.example.finalproject.manager;
 
 import com.example.finalproject.dto.JwtRequest;
@@ -12,21 +11,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @WebMvcTest(CustomAuthManager.class)
@@ -58,25 +51,11 @@ class CustomAuthManagerTest {
 
         String expectedToken = "token";
 
-        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
-                .thenReturn(null);
         when(userService.loadUserByUsername("username")).thenReturn(user);
         when(jwtTokenUtils.generateToken(user)).thenReturn(expectedToken);
 
-        ResponseEntity<?> response = customAuthManager.createAuthToken(request);
+        JwtResponse jwtResponse = customAuthManager.createAuthToken(request);
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(expectedToken, ((JwtResponse) Objects.requireNonNull(response.getBody())).getToken());
+        assertEquals(expectedToken, jwtResponse.getToken());
     }
-
-    @Test
-    void CustomAuthManagerTest_createAuthToken_Unauthorized() {
-        JwtRequest request = new JwtRequest("username", "password");
-
-        doThrow(BadCredentialsException.class).when(authenticationManager)
-                .authenticate(any(UsernamePasswordAuthenticationToken.class));
-
-        ResponseEntity<?> response = customAuthManager.createAuthToken(request);
-        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
-    }
-}*/
+}

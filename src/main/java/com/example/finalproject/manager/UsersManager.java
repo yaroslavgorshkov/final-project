@@ -4,7 +4,6 @@ import com.example.finalproject.dto.UserResponseInfoDto;
 import com.example.finalproject.entity.ProTask;
 import com.example.finalproject.entity.Task;
 import com.example.finalproject.entity.User;
-import com.example.finalproject.exception.AppError;
 import com.example.finalproject.exception.CustomUserHasNotFoundException;
 import com.example.finalproject.service.ProTaskService;
 import com.example.finalproject.service.TaskService;
@@ -13,8 +12,6 @@ import com.example.finalproject.util.TaskStatus;
 import com.example.finalproject.util.UserRole;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

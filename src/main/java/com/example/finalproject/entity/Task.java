@@ -4,10 +4,9 @@ import com.example.finalproject.util.TaskStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+
+import java.util.Objects;
 
 @Entity
 @Table(name = "user_tasks")
@@ -15,6 +14,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class Task{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,4 +33,12 @@ public class Task{
     @JsonIgnore
     @Schema(description = "User id")
     private User user;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Task task = (Task) o;
+        return Objects.equals(description, task.description) && taskStatus == task.taskStatus && Objects.equals(user, task.user);
+    }
 }

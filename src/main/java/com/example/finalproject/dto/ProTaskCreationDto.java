@@ -1,5 +1,9 @@
 package com.example.finalproject.dto;
 
+import com.example.finalproject.util.CustomLocalDateTimeUtils.LocalDateTimeDeserializer;
+import com.example.finalproject.util.CustomLocalDateTimeUtils.LocalDateTimeSerializer;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -20,5 +24,7 @@ public class ProTaskCreationDto {
 
     @Schema(description = "Task deadline", example = "2024-03-26 12:21:37.535275")
     @NotBlank(message = "Deadline mush not be blank")
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime deadline;
 }

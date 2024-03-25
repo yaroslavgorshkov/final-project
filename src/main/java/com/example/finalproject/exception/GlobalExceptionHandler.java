@@ -44,15 +44,27 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(new AppError(HttpStatus.NOT_FOUND.value(), e.getMessage()), HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(CustomTaskHasNotFoundException.class)
+    public ResponseEntity<AppError> handleCustomTaskHasNotFound(CustomTaskHasNotFoundException e) {
+        log.warn(e.getMessage());
+        return new ResponseEntity<>(new AppError(HttpStatus.NOT_FOUND.value(), e.getMessage()), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(CustomTaskDoesntBelongToUserException.class)
+    public ResponseEntity<AppError> handleCustomTaskDoesntBelongToUser(CustomTaskDoesntBelongToUserException e) {
+        log.warn(e.getMessage());
+        return new ResponseEntity<>(new AppError(HttpStatus.BAD_REQUEST.value(), e.getMessage()), HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(CustomErrorJsonParseException.class)
     public ResponseEntity<AppError> handleCustomErrorJsonParse(CustomErrorJsonParseException e) {
         log.warn(e.getMessage());
-        return new ResponseEntity<>(new AppError(HttpStatus.NOT_FOUND.value(), e.getMessage()), HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(new AppError(HttpStatus.BAD_REQUEST.value(), e.getMessage()), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(DateTimeParseException.class)
     public ResponseEntity<AppError> handleDateTimeParse(DateTimeParseException e) {
         log.warn(e.getMessage());
-        return new ResponseEntity<>(new AppError(HttpStatus.NOT_FOUND.value(), e.getMessage()), HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(new AppError(HttpStatus.BAD_REQUEST.value(), e.getMessage()), HttpStatus.BAD_REQUEST);
     }
 }
