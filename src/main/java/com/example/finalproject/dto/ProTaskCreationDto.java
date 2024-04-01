@@ -5,7 +5,9 @@ import com.example.finalproject.util.CustomLocalDateTimeUtils.LocalDateTimeSeria
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,8 +24,9 @@ public class ProTaskCreationDto {
     @Size(min = 3, max = 200, message = "Description mush be less than 200 and bigger than 3 characters")
     private String description;
 
-    @Schema(description = "Task deadline", example = "2024-03-26 12:21:37.535275")
-    @NotBlank(message = "Deadline mush not be blank")
+    @Schema(description = "Task deadline", example = "2024-03-10T12:00:00")
+    @NotNull(message = "Deadline must not be null")
+    @Future(message = "Deadline must be in the future")
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime deadline;

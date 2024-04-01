@@ -8,6 +8,10 @@ import com.example.finalproject.manager.ProTasksManager;
 import com.example.finalproject.manager.UserTasksManager;
 import com.example.finalproject.util.RoleIdentifier;
 import com.example.finalproject.util.TaskCreationUtils;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Valid;
+import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/v1/api/tasks")
@@ -23,6 +28,7 @@ import java.util.List;
 public class UserTasksController {
     private final ProTasksManager proTasksManager;
     private final UserTasksManager userTasksManager;
+    private final Validator validator;
 
     @GetMapping
     @PreAuthorize("hasAnyAuthority('PRO', 'USER')")
@@ -36,15 +42,23 @@ public class UserTasksController {
 
     @PostMapping
     @PreAuthorize("hasAnyAuthority('PRO', 'USER')")
-    public ResponseEntity<?> addTask(@RequestBody Object taskDto, Principal principal) {
+    public ResponseEntity<?> addTask(@RequestBody @Valid Object taskDto, Principal principal) {
         boolean isPro = RoleIdentifier.isPro(principal);
         if(isPro) {
             ProTaskCreationDto proTaskCreationDto = TaskCreationUtils.getProTaskCreationDto(taskDto);
+            validate(proTaskCreationDto);
             return new ResponseEntity<>(proTasksManager.addProTask(proTaskCreationDto, principal), HttpStatus.CREATED);
-
         } else {
             TaskCreationDto taskCreationDto = TaskCreationUtils.getTaskCreationDto(taskDto);
+            validate(taskCreationDto);
             return new ResponseEntity<>(userTasksManager.addTask(taskCreationDto, principal), HttpStatus.CREATED);
+        }
+    }
+
+    private void validate(Object dto) {
+        Set<ConstraintViolation<Object>> violations = validator.validate(dto);
+        if (!violations.isEmpty()) {
+            throw new ConstraintViolationException(violations);
         }
     }
 
