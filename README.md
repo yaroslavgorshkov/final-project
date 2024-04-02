@@ -44,7 +44,7 @@ Below is a list of available API endpoints with their respective HTTP methods, d
 ## Getting Started
 
 ### Prerequisites
-- JDK 11 or later
+- JDK 21 or later
 - Maven
 - A relational database (preferably PostgreSQL, there are migrations in project which use postgreSQL dialect)
 
@@ -52,7 +52,7 @@ Below is a list of available API endpoints with their respective HTTP methods, d
 1. Clone the repository to your local machine.
 2. Configure the database connection in `src/main/resources/application.yml`.
 3. Build the project using Maven: `mvn clean install`.
-4. Run the application: `java -jar target/final-project.jar`.
+4. Run the application: `java -jar target/final-project-0.0.1-SNAPSHOT.jar`.
 
 ## Usage
 After starting the application, you can interact with the API using tools like Postman or Curl. Below are some example requests:
