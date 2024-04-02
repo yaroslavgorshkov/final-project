@@ -53,7 +53,8 @@ Below is a list of available API endpoints with their respective HTTP methods, d
 2. Install Postman or other similar program for testing endpoints
 3. Install and setup postgreSQL or or other relational database
 4. Configure the database connection in `src/main/resources/application.yml`.
-5. Run the application
+5. Build the project using Maven: mvn clean install finalproject.
+6. Run the application: java -jar target/finalproject.jar.
 
 ## Usage
 After starting the application, you can interact with the API using tools like Postman or Curl. Below are some example requests:
