@@ -1,5 +1,8 @@
 package com.example.finalproject.security;
 
+import com.example.finalproject.exception.AppError;
+import com.example.finalproject.exception.CustomJwtExpiredException;
+import com.example.finalproject.exception.CustomSecretIsNotCorrectException;
 import com.example.finalproject.util.JwtTokenUtils;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.SignatureException;
@@ -9,6 +12,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -38,8 +42,10 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 roles = jwtTokenUtils.getRoles(jwt).stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
             } catch (ExpiredJwtException e) {
                 log.debug("time is expired");
+                throw new CustomJwtExpiredException("time is expired");
             } catch (SignatureException e) {
                 log.debug("secret is not correct");
+                throw new CustomSecretIsNotCorrectException("secret is not correct");
             }
         }
 
